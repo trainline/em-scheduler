@@ -1,5 +1,7 @@
 # Environment Manager Scheduler
 
+![Build status](https://travis-ci.org/trainline/em-scheduler.svg?branch=master)
+
 ## Getting started
 
 Once you have cloned the repo locally...
