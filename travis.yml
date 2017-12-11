@@ -1,0 +1,28 @@
+language: node_js
+node_js:
+- '6'
+
+install:
+  - npm install
+
+script:
+  - npm test
+  - npm run build
+
+addons:
+  artifacts:
+    paths:
+      - out/package
+
+# deploy:
+#   provider: s3
+#   access_key_id: $ARTIFACTS_KEY
+#   secret_access_key: $ARTIFACTS_SECRET
+#   bucket: $ARTIFACTS_BUCKET
+#   region: $ARTIFACTS_REGION
+#   local_dir: out/package
+#   upload-dir: $DIST_DIR
+#   skip_cleanup: true
+#   on:
+#     repo: trainline/em-scheduler
+#     all_branches: true
