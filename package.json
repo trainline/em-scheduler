@@ -1,0 +1,38 @@
+{
+  "name": "scheduler",
+  "version": "0.0.1",
+  "description": "Starts and stops instances and ASGs scheduled by Environment Manager",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "node build.js && cd out/build && npm install --production",
+    "package": "node pack.js",
+    "test": "mocha ./src/**/*.spec.js",
+    "all": "npm run test && npm run build && npm run package"
+  },
+  "author": "Trainline",
+  "license": "Apache-2.0",
+  "files": [
+    "src/**",
+    "!**/*.spec.js",
+    "package.json",
+    "package-lock.json"
+  ],
+  "dependencies": {
+    "aws-sdk": "^2.6.6",
+    "co": "^4.6.0",
+    "later": "^1.2.0",
+    "lodash": "^4.16.3",
+    "request": "^2.75.0",
+    "request-promise": "^4.1.1",
+    "roast-lambda": "^0.1.10",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "archiver-promise": "^1.0.0",
+    "chai": "^3.5.0",
+    "fs-extra": "^3.0.1",
+    "globby": "^7.1.1",
+    "mocha": "^3.1.2",
+    "sinon": "^1.17.6"
+  }
+}
