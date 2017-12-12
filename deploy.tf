@@ -55,14 +55,14 @@ resource "aws_lambda_function" "scheduler" {
   }
 }
 
-resource "aws_cloudwatch_event_rule" "every_five_minutes" {
-  name                = "every-5-minutes"
-  description         = "5 minute repeating cloudwatch event"
-  schedule_expression = "rate(5 minutes)"
+resource "aws_cloudwatch_event_rule" "every_one_minute" {
+  name                = "every-minute"
+  description         = "1 minute repeating cloudwatch event"
+  schedule_expression = "rate(1 minute)"
 }
 
 resource "aws_cloudwatch_event_target" "scheduler_cloudwatch_scheduled_trigger" {
-  rule      = "${aws_cloudwatch_event_rule.every_five_minutes.name}"
+  rule      = "${aws_cloudwatch_event_rule.every_one_minute.name}"
   target_id = "em-scheduler-trigger"
   arn       = "${aws_lambda_function.scheduler.arn}"
 }
@@ -72,5 +72,5 @@ resource "aws_lambda_permission" "scheduler_cloudwatch_scheduled_trigger_permiss
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.scheduler.function_name}"
   principal     = "events.amazonaws.com"
-  source_arn    = "${aws_cloudwatch_event_rule.every_five_minutes.arn}"
+  source_arn    = "${aws_cloudwatch_event_rule.every_one_minute.arn}"
 }
