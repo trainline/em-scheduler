@@ -8,7 +8,6 @@ let config = require('./package.json');
 
 let outDir = 'out';
 let buildDir = `${outDir}/build`;
-let zipFile = `${outDir}/${config.name}-${config.version}.zip`;
 
 async function build() {
   await fs.ensureDir(outDir);
