@@ -6,8 +6,12 @@ const co = require('co');
 
 const RateLimiter = require('./rateLimiter');
 
+const RequestService = require('./RequestService');
+const ConsulService = require('./ConsulService');
+const BlockService = require('./BlockService');
+
 function createAWSService(AWS, context, account, logger) {
-  return co(function*() {
+  return co(function* () {
     let awsConfig = { region: context.awsRegion };
 
     if (account.AccountNumber !== context.awsAccountId) {
@@ -20,10 +24,16 @@ function createAWSService(AWS, context, account, logger) {
     let autoscalingRateLimiter = new RateLimiter(10);
 
     function switchInstancesOn(instances) {
+      let consul = new ConsulService({ context });
       return promiseAllWithSlowFail(instances.map(instance => {
-        return ec2.startInstances({
-          InstanceIds: [instance.id]
-        }).promise();
+        const block = new BlockService({ key: `nodes/${instance.id}/cold-standby`, consul });
+        console.log(`UNblocking : ${instance.id}`)
+        return block.setOffInstance()
+          .then(() =>
+            ec2.startInstances({
+              InstanceIds: [instance.id]
+            }).promise()
+          );
       }));
     }
 
@@ -50,13 +60,19 @@ function createAWSService(AWS, context, account, logger) {
     }
 
     function putInstancesInStandby(instances) {
+      let consul = new ConsulService({ context });
       let tasks = instances.map(instance => {
         return () => {
-          return autoscaling.enterStandby({
-            AutoScalingGroupName: instance.asg,
-            InstanceIds: [instance.id],
-            ShouldDecrementDesiredCapacity: true
-          }).promise();
+          const block = new BlockService({ key: `nodes/${instance.id}/cold-standby`, consul });
+          console.log(`blocking : ${instance.id}`)
+          return block.setOnInstance()
+            .then(() =>
+              autoscaling.enterStandby({
+                AutoScalingGroupName: instance.asg,
+                InstanceIds: [instance.id],
+                ShouldDecrementDesiredCapacity: true
+              }).promise()
+            );
         };
       });
 
