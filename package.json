@@ -7,6 +7,7 @@
     "build": "node build.js && cd out/build && npm install --production",
     "package": "node pack.js",
     "test": "mocha ./src/**/*.spec.js",
+    "spec": "mocha -w ./src/**/*.spec.js",
     "all": "npm run test && npm run build && npm run package"
   },
   "author": "Trainline",

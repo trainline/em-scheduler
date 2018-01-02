@@ -14,7 +14,7 @@ To build and package the source into a deployable lambda...
 
 ```
 npm run build
-npm run pack
+npm run package
 ```
 
 To run the tests...
