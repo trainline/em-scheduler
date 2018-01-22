@@ -5,7 +5,6 @@ let co = require('co');
 
 function getConfig(AWS, context) {
   return co(function* () {
-    let IGNORE_ASG_INSTANCES = hasValue(context.env.IGNORE_ASG_INSTANCES, 'true');
     let LIST_SKIPPED_INSTANCES = hasValue(context.env.LIST_SKIPPED_INSTANCES, 'true');
     let WHAT_IF = hasValue(context.env.WHAT_IF, 'true');
     let ERROR_ON_FAILURE = !hasValue(context.env.ERROR_ON_FAILURE, 'false');
@@ -20,7 +19,6 @@ function getConfig(AWS, context) {
       },
       limitToAccounts: json(context.env.LIMIT_TO_ACCOUNTS) || [],
       limitToEnvironment: context.env.LIMIT_TO_ENVIRONMENT,
-      ignoreASGInstances: IGNORE_ASG_INSTANCES,
       listSkippedInstances: LIST_SKIPPED_INSTANCES,
       whatIf: WHAT_IF,
       errorOnFailure: ERROR_ON_FAILURE

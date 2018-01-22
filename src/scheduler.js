@@ -11,13 +11,14 @@ function createScheduler(config, em, AWS, context, logger) {
   function doScheduling () {
     return co(function*() {
       let accounts = yield getAccounts();
+      let environmentTypes = yield em.getEnvironmentTypes();
 
       let accountResults = yield accounts.map((account) => {
         return co(function*() {
           let aws = yield awsFactory.create(AWS, context, account, logger);
           
-          let allScheduledActions = yield getScheduledActions(account);
-          let scheduledActions = maybeFilterActionsForASGInstances(allScheduledActions);
+          let scheduledActions = yield getScheduledActions(account);
+          addConsulSettings(scheduledActions, environmentTypes);
           let actionGroups = groupActionsByType(scheduledActions);
 
           let changeResults = yield performChanges(aws, actionGroups);
@@ -33,11 +34,14 @@ function createScheduler(config, em, AWS, context, logger) {
     });
   }
 
-  function maybeFilterActionsForASGInstances(instanceActions) {
-    if (!config.ignoreASGInstances)
-      return instanceActions;
-
-    return instanceActions.filter(instanceAction => !instanceAction.instance.asg);
+  function addConsulSettings(scheduledActions, environmentTypes) {
+    scheduledActions.forEach((action) => {
+      let environmentType = _.find(environmentTypes, et =>
+        et.EnvironmentType.toLowerCase() === action.instance.environmentType.toLowerCase());
+      
+      if (environmentType)
+        action.instance.consulDataCenter = environmentType.Value.Consul.DataCenter
+    })
   }
 
   function getAccounts() {

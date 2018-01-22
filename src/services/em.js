@@ -25,6 +25,10 @@ function createEMService(config, mainLogger) {
     return get('api/v1/config/accounts');
   }
 
+  function getEnvironmentTypes() {
+    return get('api/v1/config/environment-types');
+  }
+
   function getScheduledInstanceActions(awsAccount) {
     return get(`api/v1/instances/schedule-actions?account=${awsAccount}`);
   }
@@ -73,7 +77,7 @@ function createEMService(config, mainLogger) {
     });
   }
 
-  return { getAccounts, getScheduledInstanceActions };
+  return { getAccounts, getEnvironmentTypes, getScheduledInstanceActions };
 }
 
 module.exports = {

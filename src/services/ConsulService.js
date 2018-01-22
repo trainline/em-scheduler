@@ -1,27 +1,22 @@
 'use strict';
 
-const RequestService = require('./RequestService');
+const request = require('request-promise');
 
-class ConsulService {
-    constructor({context = null, request = null} = {}) {
-        if (context === null)
-            throw new Error(`context must be provided to ${this.constructor.name}`);
-        
-        if (request === null) this.request = new RequestService();
-        else this.request = request;
-        
-        this.context = context;
-        this.endpoint = this.createAddress();
-    }
-
-    createAddress() {
-        return `http://consul.service.${this.context.env.DATA_CENTER}.consul:8500/v1/`;
-    }
-
-    updateKeyValueStore(key, value) {
-        const endpoint = `${this.endpoint}kv/${key}`;
-        return this.request.put(endpoint, value);
-    }
+function createAddress(dataCenter, key) {
+  return `http://consul.service.${dataCenter}.consul:8500/v1/kv/${key}`;
 }
 
-module.exports = ConsulService;
+function put(endpoint, payload) {
+  return request({
+    method: 'PUT',
+    uri: endpoint,
+    body: payload
+  });
+}
+
+module.exports = {
+  updateKeyValueStore: (dataCenter, key, value) => {
+    let endpoint = createAddress(dataCenter, key);
+    return put(endpoint, value);
+  }
+};

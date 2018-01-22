@@ -5,10 +5,7 @@ const guid = require('uuid');
 const co = require('co');
 
 const RateLimiter = require('./rateLimiter');
-
-const RequestService = require('./RequestService');
-const ConsulService = require('./ConsulService');
-const BlockService = require('./BlockService');
+const block = require('./BlockService');
 
 function createAWSService(AWS, context, account, logger) {
   return co(function* () {
@@ -24,11 +21,9 @@ function createAWSService(AWS, context, account, logger) {
     let autoscalingRateLimiter = new RateLimiter(10);
 
     function switchInstancesOn(instances) {
-      let consul = new ConsulService({ context });
       return promiseAllWithSlowFail(instances.map(instance => {
-        const block = new BlockService({ key: `nodes/${instance.id}/cold-standby`, consul });
-        console.log(`UNblocking : ${instance.id}`)
-        return block.setOffInstance()
+        logger.log(`Unblocking : ${instance.id}`)
+        return block.setOffInstance(instance)
           .then(() =>
             ec2.startInstances({
               InstanceIds: [instance.id]
@@ -60,12 +55,10 @@ function createAWSService(AWS, context, account, logger) {
     }
 
     function putInstancesInStandby(instances) {
-      let consul = new ConsulService({ context });
       let tasks = instances.map(instance => {
         return () => {
-          const block = new BlockService({ key: `nodes/${instance.id}/cold-standby`, consul });
-          console.log(`blocking : ${instance.id}`)
-          return block.setOnInstance()
+          logger.log(`blocking : ${instance.id}`)
+          return block.setOnInstance(instance)
             .then(() =>
               autoscaling.enterStandby({
                 AutoScalingGroupName: instance.asg,
