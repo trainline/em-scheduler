@@ -36,11 +36,13 @@ function createScheduler(config, em, AWS, context, logger) {
 
   function addConsulSettings(scheduledActions, environmentTypes) {
     scheduledActions.forEach((action) => {
-      let environmentType = _.find(environmentTypes, et =>
-        et.EnvironmentType.toLowerCase() === action.instance.environmentType.toLowerCase());
-      
-      if (environmentType)
-        action.instance.consulDataCenter = environmentType.Value.Consul.DataCenter
+      if (action.instance.environmentType) {
+        let environmentType = _.find(environmentTypes, et =>
+          et.EnvironmentType.toLowerCase() === action.instance.environmentType.toLowerCase());
+        
+        if (environmentType)
+          action.instance.consulDataCenter = environmentType.Value.Consul.DataCenter
+      }
     })
   }
 

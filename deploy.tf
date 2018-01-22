@@ -38,8 +38,8 @@ resource "aws_lambda_function" "scheduler" {
   filename         = "${var.package}"
   function_name    = "${var.name}"
   description      = "Turns on/off instances based on instance, asg or environment schedule"
-  memory_size      = 320
-  timeout          = 30
+  memory_size      = 1024
+  timeout          = 300
   role             = "${var.iam_role_arn}"
   handler          = "src/index.handler"
   source_code_hash = "${base64sha256(file("${var.package}"))}"
@@ -57,8 +57,8 @@ resource "aws_lambda_function" "scheduler" {
 
 resource "aws_cloudwatch_event_rule" "every_one_minute" {
   name                = "every-minute"
-  description         = "1 minute repeating cloudwatch event"
-  schedule_expression = "rate(1 minute)"
+  description         = "3 minute repeating cloudwatch event"
+  schedule_expression = "rate(3 minutes)"
 }
 
 resource "aws_cloudwatch_event_target" "scheduler_cloudwatch_scheduled_trigger" {

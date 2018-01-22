@@ -3,17 +3,23 @@
 const consul = require('./ConsulService')
 
 function getInstanceKey(instance) {
-    return `nodes/${instance.id}/cold-standby`;
+    if (!instance.consulDataCenter)
+        throw new Error(`Data center could not be determined for instance ${instance.id}. Check environment type tag.`)
+
+    return {
+        dataCenter: instance.consulDataCenter,
+        key: `nodes/${instance.id}/cold-standby`
+    }
 }
 
 module.exports = {
     setOnInstance: instance => {
-        let key = getInstanceKey(instance);
-        return consul.updateKeyValueStore(instance.consulDataCenter, key, 'true');
+        let { key, dataCenter } = getInstanceKey(instance);
+        return consul.updateKeyValueStore(dataCenter, key, 'true');
     },
 
     setOffInstance: instance => {
-        let key = getInstanceKey(instance);
-        return consul.updateKeyValueStore(instance.consulDataCenter, key, 'false');
+        let { key, dataCenter } = getInstanceKey(instance);
+        return consul.updateKeyValueStore(dataCenter, key, 'false');
     }
 };
