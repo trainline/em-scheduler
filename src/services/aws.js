@@ -5,11 +5,12 @@ const guid = require('uuid');
 const co = require('co');
 
 const RateLimiter = require('./rateLimiter');
-const block = require('./BlockService');
+const BlockService = new require('./BlockService');
 
 function createAWSService(AWS, context, account, logger) {
   return co(function* () {
     let awsConfig = { region: context.awsRegion };
+    let blockService = new BlockService();
 
     if (account.AccountNumber !== context.awsAccountId) {
       awsConfig.credentials = yield getCredentials();
@@ -23,7 +24,7 @@ function createAWSService(AWS, context, account, logger) {
     function switchInstancesOn(instances) {
       return promiseAllWithSlowFail(instances.map(instance => {
         logger.log(`Unblocking : ${instance.id}`)
-        return block.setOffInstance(instance)
+        return blockService.setOffInstance(instance)
           .then(() =>
             ec2.startInstances({
               InstanceIds: [instance.id]
@@ -58,7 +59,7 @@ function createAWSService(AWS, context, account, logger) {
       let tasks = instances.map(instance => {
         return () => {
           logger.log(`blocking : ${instance.id}`)
-          return block.setOnInstance(instance)
+          return blockService.setOnInstance(instance)
             .then(() =>
               autoscaling.enterStandby({
                 AutoScalingGroupName: instance.asg,

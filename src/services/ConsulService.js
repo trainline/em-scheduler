@@ -1,22 +1,16 @@
 'use strict';
 
-const request = require('request-promise');
+const RequestService = require('request-promise');
 
-function createAddress(dataCenter, key) {
-  return `http://consul.service.${dataCenter}.consul:8500/v1/kv/${key}`;
-}
+module.exports = class {
 
-function put(endpoint, payload) {
-  return request({
-    method: 'PUT',
-    uri: endpoint,
-    body: payload
-  });
-}
-
-module.exports = {
-  updateKeyValueStore: (dataCenter, key, value) => {
-    let endpoint = createAddress(dataCenter, key);
-    return put(endpoint, value);
+  constructor(requestService) {
+    this.request = requestService || RequestService
   }
+
+  updateKeyValueStore(dataCenter, key, value) {
+    let endpoint = `http://consul.service.${dataCenter}.consul:8500/v1/kv/${key}`;
+    return this.request.put({ url: endpoint, body: value });
+  }
+
 };

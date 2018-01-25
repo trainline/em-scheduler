@@ -1,6 +1,6 @@
 'use strict';
 
-const consul = require('./ConsulService')
+const ConsulService = require('./ConsulService')
 
 function getInstanceKey(instance) {
     if (!instance.consulDataCenter)
@@ -12,14 +12,20 @@ function getInstanceKey(instance) {
     }
 }
 
-module.exports = {
-    setOnInstance: instance => {
-        let { key, dataCenter } = getInstanceKey(instance);
-        return consul.updateKeyValueStore(dataCenter, key, 'true');
-    },
+module.exports = class {
 
-    setOffInstance: instance => {
-        let { key, dataCenter } = getInstanceKey(instance);
-        return consul.updateKeyValueStore(dataCenter, key, 'false');
+    constructor(consulService) {
+        this.consul = consulService || ConsulService
     }
+
+    setOnInstance(instance) {
+        let { key, dataCenter } = getInstanceKey(instance);
+        return this.consul.updateKeyValueStore(dataCenter, key, 'true');
+    }
+
+    setOffInstance(instance) {
+        let { key, dataCenter } = getInstanceKey(instance);
+        return this.consul.updateKeyValueStore(dataCenter, key, 'false');
+    }
+
 };
