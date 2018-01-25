@@ -11,7 +11,7 @@ describe('consul service', () => {
 
   beforeEach(() => consul = new ConsulService(mockRequestService))
 
-  it('should something', async () => {
+  it('should call the correct consul endpoint when assigning block settings to nodes', async () => {
     let result = await consul.updateKeyValueStore('dc', 'nodes/i-123/cold-standby', 'true');
     let expected = { url: 'http://consul.service.dc.consul:8500/v1/kv/nodes/i-123/cold-standby', body: 'true' };
 

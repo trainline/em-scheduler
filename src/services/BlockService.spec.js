@@ -27,10 +27,13 @@ describe('block service', () => {
   });
 
   it('should error if instance dataCenter is not known', () => {
-    let call = () => block.setOffInstance({ id: 'i-123', consulDataCenter: null });
-    let expected = 'Data center could not be determined for instance i-123. Check environment type tag.'
-    
-    assert.throws(call, new RegExp(expected))
+    let expectedError = 'Data center could not be determined for instance i-123. Check environment type tag.'
+
+    return block.setOffInstance({ id: 'i-123', consulDataCenter: null })
+      .then(() => { throw new Error('No error caught'); })
+      .catch(err => {
+        assert.deepStrictEqual(err, expectedError);
+      })
   });
 
 });
