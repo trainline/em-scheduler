@@ -8,6 +8,8 @@ let schedulerFactory = require('./scheduler.js');
 let environment = require('./environment.js');
 let emFactory = require('./services/em');
 
+let BlockService = require('./services/BlockService')
+
 exports.handler = rl.init({
   handler: ({ context, AWS, logger }) => {
     return co(function* () {
