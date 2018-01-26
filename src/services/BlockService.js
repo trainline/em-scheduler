@@ -20,7 +20,7 @@ function updateConsul(consul, instance, value) {
 module.exports = class {
 
     constructor(consulService) {
-        this.consul = consulService || ConsulService
+        this.consul = consulService || new ConsulService()
     }
 
     setOnInstance(instance) {

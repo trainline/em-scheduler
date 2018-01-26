@@ -7,7 +7,8 @@ const _ = require('lodash');
 const awsFactory = require('./services/aws');
 const reporting = require('./presentation/reporting');
 
-function createScheduler(config, em, AWS, context, logger) {
+function createScheduler(config, em, AWS, context, logger, blockService) {
+
   function doScheduling () {
     return co(function*() {
       let accounts = yield getAccounts();
@@ -15,7 +16,7 @@ function createScheduler(config, em, AWS, context, logger) {
 
       let accountResults = yield accounts.map((account) => {
         return co(function*() {
-          let aws = yield awsFactory.create(AWS, context, account, logger);
+          let aws = yield awsFactory.create(AWS, context, account, logger, blockService);
           
           let scheduledActions = yield getScheduledActions(account);
           addConsulSettings(scheduledActions, environmentTypes);

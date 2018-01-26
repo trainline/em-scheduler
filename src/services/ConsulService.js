@@ -1,11 +1,11 @@
 'use strict';
 
-const RequestService = require('request-promise');
+const rp = require('request-promise');
 
 module.exports = class {
 
   constructor(requestService) {
-    this.request = requestService || RequestService
+    this.request = requestService || rp
   }
 
   updateKeyValueStore(dataCenter, key, value) {

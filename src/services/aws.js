@@ -5,12 +5,10 @@ const guid = require('uuid');
 const co = require('co');
 
 const RateLimiter = require('./rateLimiter');
-const BlockService = new require('./BlockService');
 
-function createAWSService(AWS, context, account, logger) {
+function createAWSService(AWS, context, account, logger, blockService) {
   return co(function* () {
     let awsConfig = { region: context.awsRegion };
-    let blockService = new BlockService();
 
     if (account.AccountNumber !== context.awsAccountId) {
       awsConfig.credentials = yield getCredentials();

@@ -6,7 +6,6 @@ let co = require('co');
 
 let schedulerFactory = require('./scheduler.js');
 let environment = require('./environment.js');
-let awsFactory = require('./services/aws');
 let emFactory = require('./services/em');
 
 exports.handler = rl.init({
@@ -16,7 +15,9 @@ exports.handler = rl.init({
       
       let em = emFactory.create(config.em, logger);
 
-      let scheduler = schedulerFactory.create(config, em, AWS, context, logger);
+      let blockService = new BlockService();
+
+      let scheduler = schedulerFactory.create(config, em, AWS, context, logger, blockService);
       let result = yield scheduler.doScheduling();
       
       if (!result.success && config.errorOnFailure) {
